@@ -1,0 +1,8 @@
+data <- read.table("household_power_consumption.txt", sep=";", header = TRUE, na.strings = "?", stringsAsFactors=FALSE)
+gapData <- subset(data, data$Date == "1/2/2007" | data$Date == "2/2/2007")
+png("plot3.png", width = 480, height = 480)
+plot(days, gapData$Sub_metering_1, type="l", xlab="", ylab="Energy sub metering")
+lines(days, gapData$Sub_metering_2, col="red")
+lines(days, gapData$Sub_metering_3, col="blue")
+legend("topright", legend = c("Sub_metering_1", "Sub_metering_2", "Sub_metering_3"), col = c("black", "red", "blue"), lty = "solid")
+dev.off()
