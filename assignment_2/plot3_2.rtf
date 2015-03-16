@@ -1,0 +1,71 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1265\cocoasubrtf210
+{\fonttbl\f0\fnil\fcharset0 HelveticaNeue;}
+{\colortbl;\red255\green255\blue255;\red38\green38\blue38;\red11\green81\blue160;}
+\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\deftab720
+\pard\pardeftab720\sl420
+
+\f0\fs28 \cf2 ## \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0Script to create plot3\
+## note this was created and tested on Windows - may require modification to run on mac/ linux\
+## requires the "reshape2" and "ggplot2" packages to be installed\
+## Script is in two sections:\
+## Section A: load, tidy and format the data ready for plotting\
+## Section B: produce the plot file\
+\
+\
+##-----------------------------------------------------------------------------\
+## \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0Section A: tidy and format data ready for plotting\
+\
+## download, unzip the file\
+fileurl <-"{\field{\*\fldinst{HYPERLINK "https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2FNEI_data.zip"}}{\fldrslt \cf3 https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2FNEI_data.zip}}"\
+download.file(fileurl, destfile = "fpm.zip")\
+unzip("./fpm.zip")\
+\
+## read the files using the "readRDS" function\
+NEI <- readRDS("summarySCC_PM25.rds")\
+SCC <- readRDS("Source_Classification_Code.rds")\
+\
+## open the "reshape2" library\
+library(reshape2)\
+\
+## Create a table extract just for Baltimore City Maryland (fips = "24510")\
+Baltimore <- NEI[NEI$fips=="24510",]\
+\
+\
+## melt the dataframe, measured variables are Emissions, to be shown by id of year and type\
+BaltimoreMelt <- melt(Baltimore, id.vars =c("type", "year"), measure.vars = "Emissions")\
+\
+## cast dataframe to give total emissions (variable) for each combination of type and year\
+BaltimoreCast <- dcast(BaltimoreMelt, \'a0type + year ~ variable, sum)\
+\
+\
+##-----------------------------------------------------------------------------\
+## \'a0 \'a0 \'a0 \'a0 \'a0 \'a0 \'a0Section B: Produce the plot\
+\
+## \'a0 \'a0Open PNG device and create file\
+png(filename ="plot3.png", height = 400, width = 800)\
+\
+## open the ggplot2 library (assumes installed already)\
+library(ggplot2)\
+\
+## set up plot in ggplot\
+g <- ggplot(BaltimoreCast, aes(x =year, y= Emissions))\
+\
+## add grid of line graphs for each "type"\
+g <- g + geom_line() + facet_grid(.~type )\
+\
+## add a title to the plot\
+g <- g + ggtitle(expression("PM"[2.5]*" Emissions by source type for Baltimore 1999 to 2008 (tons)"))\
+\
+## print the plot to the open png device\
+print(g)\
+\
+##-----------------------------------------------------------------------------\
+## turn off graphics device\
+dev.off()\
+\
+##-----------------------------------------------------------------------------\
+## notify completion of script\
+msg <- "plot3.R script complete, plot3.png produced in R working directory"\
+print(msg, quote = FALSE)\
+}

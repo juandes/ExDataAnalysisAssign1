@@ -1,0 +1,10 @@
+sccDS <- readRDS("./exdata-data-NEI_data/Source_Classification_Code.rds")
+neiDS <- readRDS("./exdata-data-NEI_data/summarySCC_PM25.rds")
+neiDS$year <- factor(neiDS$year, levels=c('1999', '2002', '2005', '2008'))
+BaltimoreCityOnroad <- subset(neiDS, fips == 24510 & type == 'ON-ROAD')
+BaltimoreCityOnroad <- aggregate(BaltimoreCityOnroad[, 'Emissions'], by=list(BaltimoreCityOnroad$year), sum)
+colnames(BaltimoreCityOnroad) <- c('year', 'emissions')
+png(filename = "plot5.png", width = 550, height = 550, units = "px")
+ggplot(data = BaltimoreCityOnroad, aes(x = year, y = emissions)) + geom_line(aes(group= 1 , col = emissions)) + geom_point(aes(size = 1, col = emissions)) + ggtitle("Emissions from vehicle sources in Baltimore City")
+dev.off()
+
